@@ -1,6 +1,6 @@
-Welcome to the PHP-Directory-Helper wiki!
+#PHP Directory Helper#
 
-This is an all purpose directory and file parser helper. Part of any PHP developers job is to parse directories and get information about files. PHP has many awesome built in functions and classes to help get directory / file information. The purpose of these classes is to abstract a lot of cumbersome/boring file management process to you can build cool stuff. Information about php's built in capabilities can be found at the links below. 
+This is an all purpose directory and file parser helper. Part of any PHP developers job is to parse directories and get information about files. PHP has many awesome built in functions and classes to help get directory / file information. The purpose of this class is to abstract a lot of cumbersome/boring file management process to you can build cool stuff. Information about php's built in capabilities can be found at the links below. 
 
 ### Informational Links: 
 
