@@ -178,7 +178,6 @@ class Crawler {
      * 
      * @param String - A full server path to parse.
      * @return Array -  A filtered array of all files in a url friendly format. The array is filtered by the your settings.
-     *  @ 
      */
     
     public function masterFileList($domain) {

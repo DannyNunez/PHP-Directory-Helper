@@ -1,7 +1,6 @@
-PHP-Directory-Helper
-====================
+Welcome to the PHP-Directory-Helper wiki!
 
-This is an all purpose directory and file parser helper. Part of any PHP developers job is to parse directories and get information about files. PHP has many awesome built in functions and classes to help get directory / file information. The purpose of this class is to abstract a lot of cumbersome/boring file management process to you can build cool stuff. Information about php's built in capabilities can be found at the links below. 
+This is an all purpose directory and file parser helper. Part of any PHP developers job is to parse directories and get information about files. PHP has many awesome built in functions and classes to help get directory / file information. The purpose of these classes is to abstract a lot of cumbersome/boring file management process to you can build cool stuff. Information about php's built in capabilities can be found at the links below. 
 
 ### Informational Links: 
 
@@ -54,8 +53,8 @@ protected $files_ignore = array("FILE EXTENTION 1", "FILE EXTENTION 2" , "FILE E
 This will get a list of all direct subdirectories of a given path. You will need to pass a valid path on the web server and a path that the php application has access to. 
 
 ```
-    public function getDirList($path) {
-        $Directory = new DirectoryIterator($path);
+    public function getDirList($domain) {
+        $Directory = new DirectoryIterator($domain);
         foreach ($Directory as $file) {
             if ($file->isDot()) {
                 continue;
@@ -82,8 +81,8 @@ This will get a list of all direct files of a given directory. You will need to 
 
 ```
 
-   public function getFileList($directoryPath) {
-        $Directory = new DirectoryIterator($directoryPath);
+     public function getFileList($domain) {
+        $Directory = new DirectoryIterator($domain);
         foreach ($Directory as $file) {
             if ($file->isDot()) {
                 continue;
@@ -193,57 +192,27 @@ This method will return all subdirectories of a given path.
 
 ***
 
-**[getAllSubDirectories($directories, $path)](https://github.com/BigGuns99/PHP-Directory-Helper/wiki/Get-All-Sub-Directories)**
-
-This method will return all subdirectories of a given path. 
-
-```
-    public function  getAllSubDirectories($directories, $path){
-
-        foreach ($directories as $directory) {
-
-            $results = $this->getSubDirectories($path);
-
-            foreach ($results as $dir) {
-                $children = $this->getSubDirectories($dir);
-                $count = count($children);
-                if ($count > 0) {
-                    foreach ($children as $childDir) {
-                        $childDirs[] = $childDir;
-                    }
-                }
-            }
-        }
-        if (empty($childDirs)) {
-            return null;
-        }
-        return $childDirs;
-    }
-
-```
-
-
-***
-
 **[getAllSubDirectoriesRecursively($domain)](https://github.com/BigGuns99/PHP-Directory-Helper/wiki/All-Sub-Directories-Recursively)**
 
-This method will return all subdirectories recursively of a given path. 
+This method will return a filtered array of all directories. The results are filtered based on your settings.
 
 ```
     public function getAllSubDirectoriesRecursively($domain) {
         $length = strlen($domain) + 1;
+        // Get first child directories 
         $results = $this->getDirList($domain);
+        // verify is directory is set to be ignored.
         $cleaned = $this->verifyDir($results);
         foreach ($cleaned as $dirSafe) {
-            $path = $domain . '/' . $dirSafe;
+            $path = $domain . '/' . $dirSafe; 
             $subDirs = $this->getSubDirectories($path);
             if (!empty($subDirs)) {
                 foreach ($subDirs as $subPath) {
-                    if (!preg_match('/_notes/', $subPath)) {
-                        $subPathLength = strlen($subPath);
-                        $subPathLength = $subPathLength - $length;
-                        $shortPath = substr($subPath, $length, $subPathLength);
-                        $cleaned[] = $shortPath;
+                    $subPathLength = strlen($subPath);
+                    $subPathLength = $subPathLength - $length;
+                    $shortPath = substr($subPath, $length, $subPathLength);
+                    if(!$shortPath == ''){
+                    $cleaned[] = $shortPath;
                     }
                 }
             }
@@ -260,7 +229,7 @@ This method will return all subdirectories recursively of a given path.
 
 **[cycle($domain)](https://github.com/BigGuns99/PHP-Directory-Helper/wiki/Cycle-through-path-and-return-all-sub-directories.)**
 
-This method will return all subdirectories recursively of a given path. 
+This method will return a filtered array of all directories. The array is filtered by the your settings.  
 
 ```
     public function cycle($domain) {
@@ -279,13 +248,7 @@ This method will return all subdirectories recursively of a given path.
 
 **[masterFileList($domain)](https://github.com/BigGuns99/PHP-Directory-Helper/wiki/Master-File-List---URL-Friendly.)**
 
-This method will return an array with full urls to files. This is most helpful for building a sitemap for a static site. 
-
-**Parameter:** String - A vaild path to a directory. 
-
-**Return:**  Array - An array of full urls to files.
-
-**ToDo:** Fix to work on linux servers. Currently this set up for **Windows IIS** servers
+This method will return an array with full urls to files. This is most helpful for building a sitemap for a static site. The array is filtered by the your settings.
 
 ```
     public function masterFileList($domain) {
@@ -304,16 +267,13 @@ This method will return an array with full urls to files. This is most helpful f
         $results = $this->cycle($domain);
 
         foreach ($results as $result) {
-            $path = $domain . '\\' . $result;
+            $path = $domain . '//' . $result;
             $list = $this->getFileList($path);
             if (!empty($list)) {
                 foreach ($list as $file) {
                     $outCome = $this->verifySingleFile($file);
-                    if (!$outCome === FALSE) {
-                        $result = str_replace('\\', '/', $result);
-                        if (!preg_match('/svn/', $file)) {
-                           $finalResults[] = $this->http . $_SERVER['SERVER_NAME'] . '/' . $result . '/' . $file;
-                        }
+                    if (!$outCome === FALSE) {          
+                            $finalResults[] = $this->http . $_SERVER['SERVER_NAME'] . '/' . $result . '/' . $file;
                     }
                 }
             }
@@ -329,17 +289,10 @@ This method will return an array with full urls to files. This is most helpful f
 
 **[masterFileListRaw($domain)](https://github.com/BigGuns99/PHP-Directory-Helper/wiki/Master-File-List---Full-server-paths.)**
 
-This method will return an array with full server paths to files. 
-
-**Parameter:** String - A vaild path to a directory. 
-
-**Return:**  Array - An array of full server paths to files.
-
-**ToDo:** Fix to work on linux servers. Currently this set up for **Windows IIS** servers
+This method will return a filtered array of all files with their full server paths.  The array is filtered by the your settings.
 
 ```
-    public function masterFileListRaw($domain)
-    {
+    public function masterFileListRaw($domain) {
 
         // Get root files
         $rootFiles = $this->getFileList($domain);
@@ -348,22 +301,20 @@ This method will return an array with full server paths to files.
         }
         if (!empty($rootFiles)) {
             foreach ($rootFiles as $file) {
-                $finalResults[] = $_SERVER['DOCUMENT_ROOT'] . '\\' . $file;
+                $finalResults[] = $_SERVER['DOCUMENT_ROOT'] . '/' . $file;
             }
         }
         // Get Subdirectory files
         $results = $this->cycle($domain);
 
         foreach ($results as $result) {
-            $path = $domain . '\\' . $result;
+            $path = $domain . '/' . $result;
             $list = $this->getFileList($path);
             if (!empty($list)) {
                 foreach ($list as $file) {
                     $outCome = $this->verifySingleFile($file);
                     if (!$outCome === FALSE) {
-                        if (!preg_match('/svn/', $file)) {
-                            $finalResults[] = $_SERVER['DOCUMENT_ROOT'] . '\\' . $result . '\\' . $file;
-                        }
+                            $finalResults[] = $_SERVER['DOCUMENT_ROOT'] . '/' . $result . '/' . $file;
                     }
                 }
             }
